@@ -15,6 +15,8 @@ exports.createVote = async (req, res, next) => {
     // Analyze sentiment
     const sentimentAnalysis = analyzeSentiment(comment);
 
+    console.log('Sentiment Analysis Result:', sentimentAnalysis); // Debug log
+
     // Create vote
     const vote = new Vote({
       productId,
@@ -22,7 +24,7 @@ exports.createVote = async (req, res, next) => {
       comment,
       sentiment: sentimentAnalysis.sentiment,
       sentimentScore: sentimentAnalysis.score,
-      ipAddress: req.ip
+      ipAddress: req.ip || 'unknown'
     });
 
     await vote.save();
@@ -54,11 +56,26 @@ exports.getSentimentAnalysis = async (req, res, next) => {
   try {
     const votes = await Vote.find({ productId: req.params.productId });
     
+    console.log('Total votes found:', votes.length); // Debug log
+    
     const sentimentBreakdown = {
-      positive: votes.filter(v => v.sentiment === 'positive').length,
-      negative: votes.filter(v => v.sentiment === 'negative').length,
-      neutral: votes.filter(v => v.sentiment === 'neutral').length
+      positive: 0,
+      negative: 0,
+      neutral: 0
     };
+
+    votes.forEach(vote => {
+      console.log('Vote sentiment:', vote.sentiment);
+      if (vote.sentiment === 'positive') {
+        sentimentBreakdown.positive++;
+      } else if (vote.sentiment === 'negative') {
+        sentimentBreakdown.negative++;
+      } else if (vote.sentiment === 'neutral') {
+        sentimentBreakdown.neutral++;
+      }
+    });
+
+    console.log('Sentiment breakdown:', sentimentBreakdown); 
 
     const averageSentiment = votes.length > 0
       ? votes.reduce((sum, v) => sum + v.sentimentScore, 0) / votes.length
@@ -78,23 +95,39 @@ exports.getSentimentAnalysis = async (req, res, next) => {
 };
 
 async function updateProductStats(productId) {
-  const votes = await Vote.find({ productId });
-  
-  if (votes.length === 0) return;
+  try {
+    const votes = await Vote.find({ productId });
+    
+    if (votes.length === 0) return;
 
-  const averageRating = votes.reduce((sum, v) => sum + v.rating, 0) / votes.length;
-  const averageSentiment = votes.reduce((sum, v) => sum + v.sentimentScore, 0) / votes.length;
-  
-  const sentimentBreakdown = {
-    positive: votes.filter(v => v.sentiment === 'positive').length,
-    negative: votes.filter(v => v.sentiment === 'negative').length,
-    neutral: votes.filter(v => v.sentiment === 'neutral').length
-  };
+    const averageRating = votes.reduce((sum, v) => sum + v.rating, 0) / votes.length;
+    const averageSentiment = votes.reduce((sum, v) => sum + v.sentimentScore, 0) / votes.length;
+    
+    const sentimentBreakdown = {
+      positive: 0,
+      negative: 0,
+      neutral: 0
+    };
 
-  await Product.findByIdAndUpdate(productId, {
-    averageRating,
-    totalVotes: votes.length,
-    sentimentScore: averageSentiment,
-    sentimentBreakdown
-  });
+    votes.forEach(vote => {
+      if (vote.sentiment === 'positive') {
+        sentimentBreakdown.positive++;
+      } else if (vote.sentiment === 'negative') {
+        sentimentBreakdown.negative++;
+      } else if (vote.sentiment === 'neutral') {
+        sentimentBreakdown.neutral++;
+      }
+    });
+
+    console.log('Updating product with breakdown:', sentimentBreakdown);
+
+    await Product.findByIdAndUpdate(productId, {
+      averageRating,
+      totalVotes: votes.length,
+      sentimentScore: averageSentiment,
+      sentimentBreakdown: sentimentBreakdown
+    });
+  } catch (error) {
+    console.error('Error updating product stats:', error);
+  }
 }

@@ -16,7 +16,8 @@ const productSchema = new mongoose.Schema({
     enum: ['Electronics', 'Clothing', 'Food', 'Books', 'Home', 'Sports', 'Other']
   },
   imageUrl: {
-    type: String
+    type: String,
+    default: 'https://via.placeholder.com/300'
   },
   averageRating: {
     type: Number,
