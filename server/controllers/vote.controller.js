@@ -6,18 +6,13 @@ exports.createVote = async (req, res, next) => {
   try {
     const { productId, rating, comment } = req.body;
 
-    // Check if product exists
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    // Analyze sentiment
     const sentimentAnalysis = analyzeSentiment(comment);
 
-    console.log('Sentiment Analysis Result:', sentimentAnalysis); // Debug log
-
-    // Create vote
     const vote = new Vote({
       productId,
       rating,
@@ -29,7 +24,6 @@ exports.createVote = async (req, res, next) => {
 
     await vote.save();
 
-    // Update product statistics
     await updateProductStats(productId);
 
     res.status(201).json({ 

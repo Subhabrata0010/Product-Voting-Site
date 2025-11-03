@@ -3,9 +3,7 @@ const sentiment = new Sentiment();
 
 const analyzeSentiment = (text) => {
   const result = sentiment.analyze(text);
-  
-  console.log('Raw sentiment result:', result);
-  
+    
   let sentimentType;
   if (result.score > 1) {
     sentimentType = 'positive';
@@ -28,8 +26,6 @@ const analyzeSentiment = (text) => {
       sentimentType = 'neutral';
     }
   }
-
-  console.log('Determined sentiment type:', sentimentType);
 
   return {
     sentiment: sentimentType,

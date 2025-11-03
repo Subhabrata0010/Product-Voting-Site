@@ -17,7 +17,10 @@ const productSchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    default: 'https://via.placeholder.com/300'
+  },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Admin'
   },
   averageRating: {
     type: Number,

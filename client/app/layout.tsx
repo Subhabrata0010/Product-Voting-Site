@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
+import { AuthUserProvider } from "@/context/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,6 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <AuthUserProvider>
       <body className={`${geistSans.variable} ${geistMono.variable} bg-gray-100 font-tomorrow`}>
         <Navigation />
         <main className="min-h-screen">
@@ -36,6 +38,7 @@ export default function RootLayout({
           </div>
         </footer>
       </body>
+      </AuthUserProvider>
     </html>
   );
 }

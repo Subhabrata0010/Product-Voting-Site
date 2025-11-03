@@ -16,9 +16,9 @@ export default function SentimentDisplay({ sentiment }: SentimentDisplayProps) {
 
   return (
     <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-300">
-      <h3 className="text-lg font-bold mb-4">Sentiment Analysis</h3>
+      <h3 className="text-lg font-bold">Sentiment Analysis</h3>
       
-      <div className="text-xs text-gray-500 mb-4 p-2 bg-white rounded">
+      <div className="flex flex-row flex-wrap gap-6 text-xs text-gray-500 mb-4 p-2 bg-white rounded">
         <p>Total: {total}</p>
         <p>Positive: {sentiment.breakdown.positive}</p>
         <p>Negative: {sentiment.breakdown.negative}</p>

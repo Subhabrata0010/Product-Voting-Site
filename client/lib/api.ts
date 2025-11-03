@@ -7,6 +7,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // Important for cookies
 });
 
 export interface Product {
@@ -15,6 +16,7 @@ export interface Product {
   description: string;
   category: string;
   imageUrl: string;
+  author?: string;
   averageRating: number;
   totalVotes: number;
   sentimentScore: number;
@@ -83,6 +85,21 @@ export const voteAPI = {
     api.get<{ success: boolean; data: SentimentAnalysis }>(
       `/votes/${productId}/sentiment`
     ),
+};
+
+export const adminAPI = {
+  signup: (data: {
+    name: string;
+    username: string;
+    email: string;
+    contact: string;
+    password: string;
+    profileURL?: string;
+  }) => api.post("/admin/signup", data),
+  login: (email: string, password: string) =>
+    api.post("/admin/login", { email, password }),
+  logout: () => api.post("/admin/logout"),
+  getAdmin: () => api.get("/admin/getadmin"),
 };
 
 export default api;

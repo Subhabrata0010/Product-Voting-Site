@@ -13,6 +13,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Image
           src={product.imageUrl}
           alt={product.name}
+          width={500}
+          height={300}
           className="w-full h-48 object-cover rounded-lg mb-4"
         />
         <span className="inline-block bg-blue-100 text-blue-800 border-2 border-blue-700 px-2 py-1 rounded text-sm font-medium mb-2">

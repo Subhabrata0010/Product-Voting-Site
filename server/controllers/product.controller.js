@@ -24,12 +24,15 @@ exports.getProductById = async (req, res, next) => {
 exports.createProduct = async (req, res, next) => {
   try {
     const { name, description, category, imageUrl } = req.body;
+    
     const product = new Product({
       name,
       description,
       category,
-      imageUrl
+      imageUrl: imageUrl,
+      author: req.admin._id
     });
+    
     await product.save();
     res.status(201).json({ success: true, data: product });
   } catch (error) {
@@ -39,15 +42,18 @@ exports.createProduct = async (req, res, next) => {
 
 exports.updateProduct = async (req, res, next) => {
   try {
-    const product = await Product.findByIdAndUpdate(
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
     );
-    if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
-    }
-    res.json({ success: true, data: product });
+
+    res.json({ success: true, data: updatedProduct });
   } catch (error) {
     next(error);
   }
@@ -55,10 +61,12 @@ exports.updateProduct = async (req, res, next) => {
 
 exports.deleteProduct = async (req, res, next) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
+
+    await Product.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Product deleted successfully' });
   } catch (error) {
     next(error);
